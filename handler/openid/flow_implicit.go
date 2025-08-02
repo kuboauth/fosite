@@ -5,6 +5,7 @@ package openid
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ory/x/errorsx"
 
@@ -28,6 +29,9 @@ type OpenIDConnectImplicitHandler struct {
 }
 
 func (c *OpenIDConnectImplicitHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### OpenIDConnectImplicitHandler.HandleAuthorizeEndpointRequest()\n")
+
 	if !(ar.GetGrantedScopes().Has("openid") && (ar.GetResponseTypes().Has("token", "id_token") || ar.GetResponseTypes().ExactOne("id_token"))) {
 		return nil
 	} else if ar.GetResponseTypes().Has("code") {

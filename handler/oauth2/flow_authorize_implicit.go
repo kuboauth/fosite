@@ -5,6 +5,7 @@ package oauth2
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -30,7 +31,14 @@ type AuthorizeImplicitGrantTypeHandler struct {
 	}
 }
 
+func (c *AuthorizeImplicitGrantTypeHandler) GetName() string {
+	return "AuthorizeImplicitGrantTypeHandler"
+}
+
 func (c *AuthorizeImplicitGrantTypeHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### AuthorizeImplicitGrantTypeHandler.HandleAuthorizeEndpointRequest()\n")
+
 	// This let's us define multiple response types, for example open id connect's id_token
 	if !ar.GetResponseTypes().ExactOne("token") {
 		return nil

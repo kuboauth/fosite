@@ -5,6 +5,7 @@ package openid
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ory/x/errorsx"
 
@@ -19,6 +20,7 @@ func (c *OpenIDConnectExplicitHandler) HandleTokenEndpointRequest(ctx context.Co
 
 func (c *OpenIDConnectExplicitHandler) PopulateTokenEndpointResponse(ctx context.Context, requester fosite.AccessRequester, responder fosite.AccessResponder) error {
 	if !c.CanHandleTokenEndpointRequest(ctx, requester) {
+		fmt.Printf("++++++++++++++++++++++++++++OpenIDConnectExplicitHandler.PopulateTokenEndpointResponse()-1\n")
 		return errorsx.WithStack(fosite.ErrUnknownRequest)
 	}
 
@@ -26,6 +28,7 @@ func (c *OpenIDConnectExplicitHandler) PopulateTokenEndpointResponse(ctx context
 
 	authorize, err := c.OpenIDConnectRequestStorage.GetOpenIDConnectSession(ctx, authorizeCode, requester)
 	if errors.Is(err, ErrNoSessionFound) {
+		fmt.Printf("++++++++++++++++++++++++++++OpenIDConnectExplicitHandler.PopulateTokenEndpointResponse()-2\n")
 		return errorsx.WithStack(fosite.ErrUnknownRequest.WithWrap(err).WithDebug(err.Error()))
 	} else if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))

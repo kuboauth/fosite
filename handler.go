@@ -20,6 +20,8 @@ type AuthorizeEndpointHandler interface {
 	//   requesting an access token (implicit grant) as described by
 	//   Section 4.2.1, or a registered extension value as described by Section 8.4.
 	HandleAuthorizeEndpointRequest(ctx context.Context, requester AuthorizeRequester, responder AuthorizeResponder) error
+
+	GetName() string
 }
 
 type TokenEndpointHandler interface {
@@ -39,6 +41,8 @@ type TokenEndpointHandler interface {
 	// CanHandleRequest indicates, if TokenEndpointHandler can handle this request or not. If true,
 	// HandleTokenEndpointRequest can be called.
 	CanHandleTokenEndpointRequest(ctx context.Context, requester AccessRequester) bool
+
+	GetName() string
 }
 
 // RevocationHandler is the interface that allows token revocation for an OAuth2.0 provider.

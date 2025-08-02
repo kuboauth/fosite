@@ -6,6 +6,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -152,6 +153,7 @@ func (s *MemoryStore) CreateOpenIDConnectSession(_ context.Context, authorizeCod
 	s.idSessionsMutex.Lock()
 	defer s.idSessionsMutex.Unlock()
 
+	fmt.Printf("++++++++CreateOpenIDConnectSession(code:%s, requesterID:%s)\n", authorizeCode, requester.GetID())
 	s.IDSessions[authorizeCode] = requester
 	return nil
 }
@@ -162,14 +164,18 @@ func (s *MemoryStore) GetOpenIDConnectSession(_ context.Context, authorizeCode s
 
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
+		fmt.Printf("++++++++GetOpenIDConnectSession(code:%s, requesterID:%s) NOT FOUND\n", authorizeCode, requester.GetID())
 		return nil, fosite.ErrNotFound
 	}
+	fmt.Printf("++++++++GetOpenIDConnectSession(code:%s, requesterID:%s) found\n", authorizeCode, requester.GetID())
 	return cl, nil
 }
 
 func (s *MemoryStore) DeleteOpenIDConnectSession(_ context.Context, authorizeCode string) error {
 	s.idSessionsMutex.Lock()
 	defer s.idSessionsMutex.Unlock()
+
+	fmt.Printf("++++++++DeleteOpenIDConnectSession(code:%s)\n", authorizeCode)
 
 	delete(s.IDSessions, authorizeCode)
 	return nil

@@ -23,6 +23,10 @@ type ClientCredentialsGrantHandler struct {
 	}
 }
 
+func (c *ClientCredentialsGrantHandler) GetName() string {
+	return "ClientCredentialsGrantHandler"
+}
+
 // IntrospectTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-4.4.2
 func (c *ClientCredentialsGrantHandler) HandleTokenEndpointRequest(ctx context.Context, request fosite.AccessRequester) error {
 	if !c.CanHandleTokenEndpointRequest(ctx, request) {

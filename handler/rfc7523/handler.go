@@ -39,6 +39,10 @@ type Handler struct {
 
 var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
+func (c *Handler) GetName() string {
+	return "rfc7523.Handler"
+}
+
 // HandleTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-4.1.3 (everything) and
 // https://tools.ietf.org/html/rfc7523#section-2.1 (everything)
 func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite.AccessRequester) error {

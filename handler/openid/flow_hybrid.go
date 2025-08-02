@@ -5,6 +5,7 @@ package openid
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ory/x/errorsx"
@@ -31,6 +32,9 @@ type OpenIDConnectHybridHandler struct {
 }
 
 func (c *OpenIDConnectHybridHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### OpenIDConnectHybridHandler.HandleAuthorizeEndpointRequest()\n")
+
 	if len(ar.GetResponseTypes()) < 2 {
 		return nil
 	}

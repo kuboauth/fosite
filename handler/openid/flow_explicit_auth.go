@@ -5,6 +5,7 @@ package openid
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ory/x/errorsx"
 
@@ -34,8 +35,16 @@ var oidcParameters = []string{"grant_type",
 	"nonce",
 }
 
+func (c *OpenIDConnectExplicitHandler) GetName() string {
+	return "OpenIDConnectExplicitHandler"
+}
+
 func (c *OpenIDConnectExplicitHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-1\n")
+
 	if !(ar.GetGrantedScopes().Has("openid") && ar.GetResponseTypes().ExactOne("code")) {
+		fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-2  GetGrantedScopes:%v  GetResponseTypes:%v\n", ar.GetGrantedScopes(), ar.GetResponseTypes())
 		return nil
 	}
 
@@ -44,6 +53,7 @@ func (c *OpenIDConnectExplicitHandler) HandleAuthorizeEndpointRequest(ctx contex
 	//}
 
 	if len(resp.GetCode()) == 0 {
+		fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-3\n")
 		return errorsx.WithStack(fosite.ErrMisconfiguration.WithDebug("The authorization code has not been issued yet, indicating a broken code configuration."))
 	}
 
@@ -56,18 +66,22 @@ func (c *OpenIDConnectExplicitHandler) HandleAuthorizeEndpointRequest(ctx contex
 	// Note: as per the Hybrid Flow documentation the Hybrid Flow has the same requirements as the Authorization Code Flow.
 	rawRedirectURI := ar.GetRequestForm().Get("redirect_uri")
 	if len(rawRedirectURI) == 0 {
+		fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-4\n")
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("The 'redirect_uri' parameter is required when using OpenID Connect 1.0."))
 	}
 
 	if err := c.OpenIDConnectRequestValidator.ValidatePrompt(ctx, ar); err != nil {
+		fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-5\n")
 		return err
 	}
 
 	if err := c.OpenIDConnectRequestStorage.CreateOpenIDConnectSession(ctx, resp.GetCode(), ar.Sanitize(oidcParameters)); err != nil {
+		fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-6\n")
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	// there is no need to check for https, because it has already been checked by core.explicit
 
+	fmt.Printf("##################### OpenIDConnectExplicitHandler.HandleAuthorizeEndpointRequest()-7\n")
 	return nil
 }

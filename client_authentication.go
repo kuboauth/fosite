@@ -66,6 +66,9 @@ func (f *Fosite) AuthenticateClient(ctx context.Context, r *http.Request, form u
 // DefaultClientAuthenticationStrategy provides the fosite's default client authentication strategy,
 // HTTP Basic Authentication and JWT Bearer
 func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *http.Request, form url.Values) (Client, error) {
+
+	fmt.Printf("============================== DefaultClientAuthenticationStrategy()\n")
+
 	if assertionType := form.Get("client_assertion_type"); assertionType == clientAssertionJWTBearerType {
 		assertion := form.Get("client_assertion")
 		if len(assertion) == 0 {
@@ -93,6 +96,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 
 			client, err = f.Store.GetClient(ctx, clientID)
 			if err != nil {
+				fmt.Printf("============================== DefaultClientAuthenticationStrategy() f.Store.GetCLient(ctx, clientID=%s) fail (err:%v)\n", clientID, err)
 				return nil, errorsx.WithStack(ErrInvalidClient.WithWrap(err).WithDebug(err.Error()))
 			}
 
@@ -218,6 +222,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 
 	// Enforce client authentication
 	if err := f.checkClientSecret(ctx, client, []byte(clientSecret)); err != nil {
+		fmt.Printf("============================== DefaultClientAuthenticationStrategy() f.checkClientSecret() fail (err:%v)\n", err)
 		return nil, errorsx.WithStack(ErrInvalidClient.WithWrap(err).WithDebug(err.Error()))
 	}
 

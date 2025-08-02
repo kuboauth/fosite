@@ -5,6 +5,7 @@ package fosite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -41,7 +42,10 @@ import (
 //     credentials (or assigned other authentication requirements), the
 //     client MUST authenticate with the authorization server as described
 //     in Section 3.2.1.
+
 func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session Session) (_ AccessRequester, err error) {
+	fmt.Printf("******************************************* NewAccessRequest1()\n")
+
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.NewAccessRequest")
 	defer otelx.End(span, &err)
 
@@ -71,13 +75,20 @@ func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session 
 		return accessRequest, errorsx.WithStack(ErrInvalidRequest.WithHint("Request parameter 'grant_type' is missing"))
 	}
 
+	fmt.Printf("******************************************* NewAccessRequest2()\n")
+
 	client, clientErr := f.AuthenticateClient(ctx, r, r.PostForm)
 	if clientErr == nil {
 		accessRequest.Client = client
 	}
 
+	fmt.Printf("******************************************* NewAccessRequest2b()  clientErr=%v\n", clientErr)
+
 	var found = false
 	for _, loader := range f.Config.GetTokenEndpointHandlers(ctx) {
+
+		fmt.Printf("******************************************* NewAccessRequest3-a() loader=%s\n", loader.GetName())
+
 		// Is the loader responsible for handling the request?
 		if !loader.CanHandleTokenEndpointRequest(ctx, accessRequest) {
 			continue
@@ -88,6 +99,7 @@ func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session 
 		// Is the client supplied in the request? If not can this handler skip client auth?
 		if !loader.CanSkipClientAuth(ctx, accessRequest) && clientErr != nil {
 			// No client and handler can not skip client auth -> error.
+			fmt.Printf("******************************************* NewAccessRequest3-b() loader=%s\n", loader.GetName())
 			return accessRequest, clientErr
 		}
 
@@ -100,9 +112,11 @@ func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session 
 			//
 			continue
 		} else if err != nil {
+			fmt.Printf("******************************************* NewAccessRequest3-c() loader=%s\n", loader.GetName())
 			return accessRequest, err
 		}
 	}
+	fmt.Printf("******************************************* NewAccessRequest4()\n")
 
 	if !found {
 		return nil, errorsx.WithStack(ErrInvalidRequest)

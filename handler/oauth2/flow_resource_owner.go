@@ -38,6 +38,10 @@ type Session interface {
 	SetSubject(subject string)
 }
 
+func (c *ResourceOwnerPasswordCredentialsGrantHandler) GetName() string {
+	return "ResourceOwnerPasswordCredentialsGrantHandler"
+}
+
 // HandleTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-4.3.2
 func (c *ResourceOwnerPasswordCredentialsGrantHandler) HandleTokenEndpointRequest(ctx context.Context, request fosite.AccessRequester) error {
 	if !c.CanHandleTokenEndpointRequest(ctx, request) {

@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"regexp"
 
 	"github.com/ory/x/errorsx"
@@ -33,7 +34,14 @@ var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
 var verifierWrongFormat = regexp.MustCompile("[^\\w\\.\\-~]")
 
+func (c *Handler) GetName() string {
+	return "pkce.Handler"
+}
+
 func (c *Handler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### Handler.HandleAuthorizeEndpointRequest()\n")
+
 	// This let's us define multiple response types, for example open id connect's id_token
 	if !ar.GetResponseTypes().Has("code") {
 		return nil

@@ -5,6 +5,7 @@ package oauth2
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -38,6 +39,10 @@ type AuthorizeExplicitGrantHandler struct {
 	}
 }
 
+func (c *AuthorizeExplicitGrantHandler) GetName() string {
+	return "AuthorizeExplicitGrantHandler"
+}
+
 func (c *AuthorizeExplicitGrantHandler) secureChecker(ctx context.Context) func(context.Context, *url.URL) bool {
 	if c.Config.GetRedirectSecureChecker(ctx) == nil {
 		return fosite.IsRedirectURISecure
@@ -46,10 +51,15 @@ func (c *AuthorizeExplicitGrantHandler) secureChecker(ctx context.Context) func(
 }
 
 func (c *AuthorizeExplicitGrantHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+
+	fmt.Printf("##################### AuthorizeExplicitGrantHandler.HandleAuthorizeEndpointRequest1()\n")
+
 	// This let's us define multiple response types, for example open id connect's id_token
 	if !ar.GetResponseTypes().ExactOne("code") {
 		return nil
 	}
+
+	fmt.Printf("##################### AuthorizeExplicitGrantHandler.HandleAuthorizeEndpointRequest2()\n")
 
 	ar.SetDefaultResponseMode(fosite.ResponseModeQuery)
 
@@ -62,6 +72,8 @@ func (c *AuthorizeExplicitGrantHandler) HandleAuthorizeEndpointRequest(ctx conte
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URL is using an insecure protocol, http is only allowed for hosts with suffix 'localhost', for example: http://myapp.localhost/."))
 	}
 
+	fmt.Printf("##################### AuthorizeExplicitGrantHandler.HandleAuthorizeEndpointRequest3()\n")
+
 	client := ar.GetClient()
 	for _, scope := range ar.GetRequestedScopes() {
 		if !c.Config.GetScopeStrategy(ctx)(client.GetScopes(), scope) {
@@ -69,9 +81,13 @@ func (c *AuthorizeExplicitGrantHandler) HandleAuthorizeEndpointRequest(ctx conte
 		}
 	}
 
+	fmt.Printf("##################### AuthorizeExplicitGrantHandler.HandleAuthorizeEndpointRequest4()\n")
+
 	if err := c.Config.GetAudienceStrategy(ctx)(client.GetAudience(), ar.GetRequestedAudience()); err != nil {
 		return err
 	}
+
+	fmt.Printf("##################### AuthorizeExplicitGrantHandler.HandleAuthorizeEndpointRequest5()\n")
 
 	return c.IssueAuthorizeCode(ctx, ar, resp)
 }

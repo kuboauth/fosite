@@ -5,6 +5,7 @@ package fosite
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
@@ -26,10 +27,13 @@ func (f *Fosite) NewAccessResponse(ctx context.Context, requester AccessRequeste
 
 	for _, tk = range f.Config.GetTokenEndpointHandlers(ctx) {
 		if err = tk.PopulateTokenEndpointResponse(ctx, requester, response); err == nil {
+			fmt.Printf("---------------------GetTokenEndpointHandlers()-1  tokenEndpoinHandler:%s\n", tk.GetName())
 			// do nothing
 		} else if errors.Is(err, ErrUnknownRequest) {
+			fmt.Printf("---------------------GetTokenEndpointHandlers()-2  tokenEndpoinHandler:%s\n", tk.GetName())
 			// do nothing
 		} else if err != nil {
+			fmt.Printf("---------------------GetTokenEndpointHandlers()-3  tokenEndpoinHandler:%s\n", tk.GetName())
 			return nil, err
 		}
 	}

@@ -32,6 +32,10 @@ type RefreshTokenGrantHandler struct {
 	}
 }
 
+func (c *RefreshTokenGrantHandler) GetName() string {
+	return "RefreshTokenGrantHandler"
+}
+
 // HandleTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-6
 func (c *RefreshTokenGrantHandler) HandleTokenEndpointRequest(ctx context.Context, request fosite.AccessRequester) error {
 	if !c.CanHandleTokenEndpointRequest(ctx, request) {
